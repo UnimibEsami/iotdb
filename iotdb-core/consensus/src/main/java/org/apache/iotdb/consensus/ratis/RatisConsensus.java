@@ -156,7 +156,11 @@ class RatisConsensus implements IConsensus {
     this.ratisMetricSet = new RatisMetricSet();
     this.readRetryPolicy =
         RetryPolicy.<RaftClientReply>newBuilder()
-            .setRetryHandler(c -> !c.isSuccess() && c.getException() instanceof ReadIndexException)
+            .setRetryHandler(
+                c ->
+                    !c.isSuccess()
+                        && (c.getException() instanceof ReadIndexException
+                            || c.getException() instanceof NotLeaderException))
             .setMaxAttempts(this.config.getImpl().getRetryTimesMax())
             .setWaitTime(
                 TimeDuration.valueOf(
